@@ -39,6 +39,10 @@ int main(int argc, char **argv)
     FILE *fp;
     int i=0, j=0;
 
+    if(argc < 2) {
+        printf("포트 주소를 입력해주세요!\n");
+        return -1;
+    }
 
     fp = fopen("user_info.txt", "r");
     i=0;
@@ -57,12 +61,24 @@ int main(int argc, char **argv)
     // 첫번째 인자는 IP protocol family - 2층 선택
     // 두번째 인자는 TCP설정, 세번째 인자는 Transmission Control Protocol - 3층
     iDs = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(iDs<0) // 예외 처리 - 소켓 생성에 실패했을 때
+    {
+        perror("socket() failed");
+        close(iDs); // 열었던 소켓을 닫는다.  
+        return -10;
+    }
     stAddr.sin_family = AF_INET; // socket()의 첫번째 인자와 같다.
     // 주소 변환
     iRet = inet_pton(AF_INET, localhost, &stAddr.sin_addr.s_addr);
     if(iRet == 0)
     {
         printf("inet_pton() failed.\ninvalid address string\n");
+        close(iDs); // 열었던 소켓을 닫는다.  
+        return -100;
+    }
+    else if(iRet < 0)
+    {
+        perror("inet_pton() failded");  
         close(iDs); // 열었던 소켓을 닫는다.  
         return -100;
     }
@@ -74,9 +90,20 @@ int main(int argc, char **argv)
     // 여기부터 client와 달라진다.
     // 지역 주소에 바인드(bind-소켓에 이름을 묶는다.)
     // 소켓 세팅(윈도우 레지스트 함수랑 유사)
-    bind(iDs, (struct sockaddr *)&stAddr, iAddSize));
+    if(0>bind(iDs, (struct sockaddr *)&stAddr, iAddSize))
+    {
+        perror("bind() failed");
+        close(iDs); // 열었던 소켓을 닫는다.  
+        return -100;
+    }
     // 소켓이 들어오는 요청을 처리할 수 있도록 설정(listen)  
-    listen(iDs, 5)
+    if(0>listen(iDs, 5)) 
+    {
+        perror("listen() failed");
+        close(iDs);
+        return -100;
+    }
+
     maxDs = iDs+1; // +1 하지 않으면 select가 한 비트 앞까지만 검사한다.
 
     while(1)
@@ -138,6 +165,13 @@ int main(int argc, char **argv)
                 }
                 return -100;
             }
+            // 접속 제한 인원보다 많이 들어 왔는가 확인
+            if(MAXCLIENT <= iCNum)
+            {
+                write(iAccept, "Server is full connection\n", sizeof("Server is full connection\n"));
+                close(iAccept);
+                continue ;
+            }
             // 중간에 빈 파일디스크립터로 생성되었을 경우에는 더하면 안되므로
             if(iAccept == maxDs)
             {
@@ -152,6 +186,33 @@ int main(int argc, char **argv)
             // 다시 처음으로 돌아간다.
             continue ;
         }
+        // 들어온 쪽을 찾기 위해 열려진 부분을 모두 찾아야 한다.
+        for(iCounter=0;iCNum>iCounter;++iCounter)// 전체 접속 인원 검색
+        {
+            if(connect_check == 0) {
+                read(iaClient[iCounter], (char*)&user_info, 60);
+                printf("ID : %s\nPW : %s\n", user_info.id, user_info.pw);
+                //소켓 스트림으로부터 아이디와 패스워드를 받아오는 부분
+
+                FILE *fp = fopen("user_info.bin", "rb");
+                char error_msg[15]; 
+                strcpy(error_msg, "disconnect");
+
+                while(!feof(fp)) {
+                    if(0 == (fread(&user_info_chk, sizeof(user_info_chk), 1, fp))) break;
+                    printf("\n\n    ID : %s       PW : %s\n\nID_chk : %s     PW : %s\n\n", user_info.id, user_info.pw, user_info_chk.id, user_info_chk.pw);
+                    if(strcmp(user_info.id, user_info_chk.id) == 0)
+                        if(strcmp(user_info.pw, user_info_chk.pw) == 0) {
+                            strcpy(error_msg, "connect");
+                            break;
+                        }
+                }
+                write(iaClient[iCounter], error_msg, sizeof(error_msg));
+                fclose(fp);
+            }
+            connect_check = 1;
+
+            // 해당하는 Client에 1이 세팅(입력이 들어왔는가)
             // 사용자 소켓 번호 체크
             if(1==FD_ISSET(iaClient[iCounter], &fsStatus))
             {
