@@ -35,14 +35,6 @@ void Widget::readyRead()
     ui->listWidget->scrollToBottom();
 }
 
-void Widget::connected()
-{
-    socket->write(QString(ui->id_edit->text()+"\n").toUtf8());
-    socket->write(QString(ui->pw_edit->text()).toUtf8());
-    //socket->write(QString("/me:"+ui->messageLineEdit->text()+"\n").toUtf8());
-}
-
-
 
 void Widget::on_connectButton_clicked()
 {
@@ -50,7 +42,6 @@ void Widget::on_connectButton_clicked()
 
     connect(socket,SIGNAL(readyRead()),this,SLOT(readyRead()));
     connect(socket,SIGNAL(connected()),this,SLOT(connected()));
-    socket->connectToHost(ui->ipLineEdit->text(),ui->portLineEdit->text().toInt());
 }
 
 void Widget::on_sendButton_clicked()
@@ -61,11 +52,19 @@ void Widget::on_sendButton_clicked()
     {
         socket->write(QString(message+"\n").toUtf8());
     }
-    ui->messageLineEdit->clear();
-    ui->messageLineEdit->setFocus();
 }
 
-void Widget::on_messageLineEdit_returnPressed()
+
+void Widget::on_pushButton_clicked()
 {
-    on_sendButton_clicked();
+    //ipLineEdit .. File Send IP
+    //fileName_edit
+    QString cmd_msg, send_ip, file_name;
+    file_name = "./" + ui->fileName_edit->text();
+    send_ip = "/home/parallels/ftp_test";
+    cmd_msg = "scp " + file_name + " " + send_ip;
+    qDebug() << cmd_msg;
+    QProcess::execute("cmd_msg");
+    //QProcess process;
+    //process.start("gedit", QStringList() << "/home/parallels/test.txt");
 }
