@@ -17,7 +17,17 @@ struct _user_info
 
 int main(int argc, char **argv)
 { 
+    FILE *fp;
 
 
-	//서버 코드는 추후 작성 예정 .. 아직 틀만 작성했음
+    fp = fopen("user_info.txt", "r");
+    i=0;
+    while(!feof(fp)) {
+        fgets(idList[i++], 20, fp);
+    }
+    j = i-1;
+    for(i=0; i<j; i++) {
+        printf("등록된 사용자 목록[%d번]: %s\n", i+1, idList[i]);
+    }
+    fclose(fp);
 }
