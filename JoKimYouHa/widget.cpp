@@ -50,6 +50,7 @@ void Widget::on_connectButton_clicked()
 
     connect(socket,SIGNAL(readyRead()),this,SLOT(readyRead()));
     connect(socket,SIGNAL(connected()),this,SLOT(connected()));
+    socket->connectToHost(ui->ipLineEdit->text(),ui->portLineEdit->text().toInt());
 }
 
 void Widget::on_sendButton_clicked()

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.7.1, 2018-12-20T21:49:23. -->
+<!-- Written by QtCreator 4.7.1, 2018-12-20T21:51:29. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -307,7 +307,7 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">JoKimYouHa</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">JoKimYouHa2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/parallels/Desktop/JoKimYouHa-1/JoKimYouHa.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/parallels/Desktop/JoKimYouHa-2/JoKimYouHa.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">JoKimYouHa.pro</value>
