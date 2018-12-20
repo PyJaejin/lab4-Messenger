@@ -35,6 +35,14 @@ void Widget::readyRead()
     ui->listWidget->scrollToBottom();
 }
 
+void Widget::connected()
+{
+    socket->write(QString(ui->id_edit->text()+"\n").toUtf8());
+    socket->write(QString(ui->pw_edit->text()).toUtf8());
+    //socket->write(QString("/me:"+ui->messageLineEdit->text()+"\n").toUtf8());
+}
+
+
 
 void Widget::on_connectButton_clicked()
 {
@@ -42,6 +50,7 @@ void Widget::on_connectButton_clicked()
 
     connect(socket,SIGNAL(readyRead()),this,SLOT(readyRead()));
     connect(socket,SIGNAL(connected()),this,SLOT(connected()));
+    socket->connectToHost(ui->ipLineEdit->text(),ui->portLineEdit->text().toInt());
 }
 
 void Widget::on_sendButton_clicked()
@@ -52,8 +61,14 @@ void Widget::on_sendButton_clicked()
     {
         socket->write(QString(message+"\n").toUtf8());
     }
+    ui->messageLineEdit->clear();
+    ui->messageLineEdit->setFocus();
 }
 
+void Widget::on_messageLineEdit_returnPressed()
+{
+    on_sendButton_clicked();
+}
 
 void Widget::on_pushButton_clicked()
 {
